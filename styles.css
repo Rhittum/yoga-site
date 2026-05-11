@@ -647,3 +647,27 @@ textarea {
     transform: none;
   }
 }
+
+.social-icon {
+  fill: gray; /* Initial color */
+  transition: fill 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: black;
+}
+
+.social-icon-whatsapp {
+  fill: gray; /* Initial color */
+  transition: fill 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: black;
+}
+
+.social-icon:hover {
+  fill: #1DA1F2; /* Twitter Blue on hover */
+}
