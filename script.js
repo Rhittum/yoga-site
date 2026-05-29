@@ -64,7 +64,7 @@ document.querySelectorAll(".dynamic-text").forEach((element) => {
 });
 
 const contactForm = document.querySelector(".contact-form");
-const WHATSAPP_NUMBER = "919992651439";
+const WHATSAPP_NUMBER = "917988299200";
 
 function showToast(message) {
 	const overlay = document.createElement("div");
