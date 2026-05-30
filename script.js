@@ -15,7 +15,8 @@ document.querySelectorAll(".site-nav a").forEach((link) => {
 		(page === "home" && href === "index.html") ||
 		(page === "about" && href === "about.html") ||
 		(page === "classes" && href === "classes.html") ||
-		(page === "contact" && href === "contact.html")
+		(page === "contact" && href === "contact.html") ||
+		(page === "reviews" && href === "reviews.html")
 	) {
 		link.classList.add("is-active");
 	}
@@ -117,5 +118,86 @@ if (contactForm) {
 		}
 
 		showToast("Inquiry Sent");
+	});
+}
+
+const reviewsContainer = document.querySelector('.review-grid');
+
+fetch('http://localhost:3000/api/reviews')
+	.then(response => response.json())
+	.then(reviews => {
+		reviews.forEach(item => {
+			const reviewDiv = document.createElement('div');
+			reviewDiv.className = 'review-card';
+			reviewDiv.innerHTML = `
+			<h3>${item.name}</h3>
+			<p>${item.review}</p>
+			`;
+			reviewsContainer.appendChild(reviewDiv);
+		});
+	})
+	.catch(error => console.error('Error fetching reviews', error));
+
+const addBtn = document.querySelector('.review-add-btn');
+const modalOverlay = document.querySelector('.review-modal-overlay');
+const modalClose = document.querySelector('.review-modal-close');
+const reviewForm = document.querySelector('.review-form');
+
+if (addBtn && modalOverlay) {
+	addBtn.addEventListener('click', () => {
+		modalOverlay.classList.add('is-visible');
+	});
+
+	function closeReviewModal() {
+		modalOverlay.classList.remove('is-visible');
+	}
+
+	modalClose.addEventListener('click', closeReviewModal);
+	modalOverlay.addEventListener('click', (e) => {
+		if (e.target === modalOverlay) closeReviewModal();
+	});
+}
+
+if (reviewForm) {
+	reviewForm.addEventListener('submit', (e) => {
+		e.preventDefault();
+
+		const name = reviewForm.querySelector('input[name="name"]').value.trim();
+		const phone = reviewForm.querySelector('input[name="phone"]').value.trim();
+		const review = reviewForm.querySelector('textarea').value.trim();
+
+		if (!name || !review) {
+			showToast('Please fill in all required fields');
+			return;
+		}
+
+		const button = reviewForm.querySelector('button[type="submit"]');
+		button.disabled = true;
+
+		fetch('http://localhost:3000/api/reviews', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ name, phone, review })
+		})
+			.then(response => {
+				if (!response.ok) throw new Error('Failed to submit');
+				return response.json();
+			})
+			.then(() => {
+				const card = document.createElement('div');
+				card.className = 'review-card';
+				card.innerHTML = `<h3>${name}</h3><p>${review}</p>`;
+				reviewsContainer.prepend(card);
+				reviewForm.reset();
+				closeReviewModal();
+				showToast('Review submitted!');
+			})
+			.catch(error => {
+				console.error('Error submitting review', error);
+				showToast('Could not submit review');
+			})
+			.finally(() => {
+				button.disabled = false;
+			});
 	});
 }
