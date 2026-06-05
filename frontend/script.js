@@ -123,13 +123,64 @@ if (contactForm) {
 
 const reviewsContainer = document.querySelector('.review-grid');
 
-fetch('http://localhost:3000/api/reviews')
+function renderStars(rating) {
+	let html = '<div class="review-stars">';
+	for (let i = 1; i <= 5; i++) {
+		html += `<span class="star${i <= rating ? ' is-filled' : ''}"></span>`;
+	}
+	html += '</div>';
+	return html;
+}
+
+if (page === 'home') {
+	const scrollTrack = document.getElementById('scroll-track');
+
+	fetch('http://127.0.0.1:3000/api/reviews/rating')
+		.then(r => r.json())
+		.then(data => {
+			const starsEl = document.getElementById('average-stars');
+			const scoreEl = document.getElementById('average-score');
+			const countEl = document.getElementById('review-count');
+			if (data.average) {
+				scoreEl.textContent = data.average;
+				countEl.textContent = `${data.count} reviews`;
+				starsEl.innerHTML = renderStars(Math.round(data.average));
+			} else {
+				scoreEl.textContent = '—';
+				countEl.textContent = 'No reviews yet';
+			}
+		})
+		.catch(() => {});
+
+	if (scrollTrack) {
+		fetch('http://127.0.0.1:3000/api/reviews')
+			.then(r => r.json())
+			.then(reviews => {
+				if (reviews.length === 0) {
+					scrollTrack.innerHTML = '<div class="scroll-item">No reviews yet</div>';
+					return;
+				}
+				const items = reviews.map(item => `
+					<div class="scroll-item">
+						${item.rating ? renderStars(item.rating) : ''}
+						<strong>${item.name}</strong>
+						<p>${item.review}</p>
+					</div>
+				`).join('');
+				scrollTrack.innerHTML = items + items;
+			})
+			.catch(() => {});
+	}
+}
+
+fetch('http://127.0.0.1:3000/api/reviews')
 	.then(response => response.json())
 	.then(reviews => {
 		reviews.forEach(item => {
 			const reviewDiv = document.createElement('div');
 			reviewDiv.className = 'review-card';
 			reviewDiv.innerHTML = `
+			${item.rating ? renderStars(item.rating) : ''}
 			<h3>${item.name}</h3>
 			<p>${item.review}</p>
 			`;
@@ -158,6 +209,35 @@ if (addBtn && modalOverlay) {
 	});
 }
 
+const starRating = document.querySelector('.star-rating');
+let selectedRating = 0;
+
+if (starRating) {
+	function highlightStars(count) {
+		starRating.querySelectorAll('.star').forEach(star => {
+			const value = parseInt(star.dataset.value);
+			star.classList.toggle('is-hover', value <= count);
+		});
+	}
+
+	function setSelected(count) {
+		starRating.querySelectorAll('.star').forEach(star => {
+			const value = parseInt(star.dataset.value);
+			star.classList.toggle('is-selected', value <= count);
+		});
+	}
+
+	starRating.querySelectorAll('.star').forEach(star => {
+		star.addEventListener('mouseenter', () => highlightStars(parseInt(star.dataset.value)));
+		star.addEventListener('click', () => {
+			selectedRating = parseInt(star.dataset.value);
+			setSelected(selectedRating);
+		});
+	});
+
+	starRating.addEventListener('mouseleave', () => highlightStars(selectedRating));
+}
+
 if (reviewForm) {
 	reviewForm.addEventListener('submit', (e) => {
 		e.preventDefault();
@@ -171,13 +251,18 @@ if (reviewForm) {
 			return;
 		}
 
+		if (selectedRating === 0) {
+			showToast('Please select a rating');
+			return;
+		}
+
 		const button = reviewForm.querySelector('button[type="submit"]');
 		button.disabled = true;
 
-		fetch('http://localhost:3000/api/reviews', {
+		fetch('http://127.0.0.1:3000/api/reviews', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ name, phone, review })
+			body: JSON.stringify({ name, phone, review, rating: selectedRating })
 		})
 			.then(response => {
 				if (!response.ok) throw new Error('Failed to submit');
@@ -186,9 +271,15 @@ if (reviewForm) {
 			.then(() => {
 				const card = document.createElement('div');
 				card.className = 'review-card';
-				card.innerHTML = `<h3>${name}</h3><p>${review}</p>`;
+				card.innerHTML = `
+				${renderStars(selectedRating)}
+				<h3>${name}</h3>
+				<p>${review}</p>
+				`;
 				reviewsContainer.prepend(card);
 				reviewForm.reset();
+				selectedRating = 0;
+				setSelected(0);
 				closeReviewModal();
 				showToast('Review submitted!');
 			})
