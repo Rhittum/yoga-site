@@ -246,13 +246,13 @@ if (reviewForm) {
 		const phone = reviewForm.querySelector('input[name="phone"]').value.trim();
 		const review = reviewForm.querySelector('textarea').value.trim();
 
-		if (!name || !review) {
-			showToast('Please fill in all required fields');
+		if (selectedRating === 0) {
+			showToast('Please select a rating');
 			return;
 		}
 
-		if (selectedRating === 0) {
-			showToast('Please select a rating');
+		if (!name || !review) {
+			showToast('Please fill in all required fields');
 			return;
 		}
 
