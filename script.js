@@ -135,7 +135,7 @@ function renderStars(rating) {
 if (page === 'home') {
 	const scrollTrack = document.getElementById('scroll-track');
 
-	fetch('http://127.0.0.1:3000/api/reviews/rating')
+	fetch('/api/reviews/rating')
 		.then(r => r.json())
 		.then(data => {
 			const starsEl = document.getElementById('average-stars');
@@ -153,7 +153,7 @@ if (page === 'home') {
 		.catch(() => {});
 
 	if (scrollTrack) {
-		fetch('http://127.0.0.1:3000/api/reviews')
+		fetch('/api/reviews')
 			.then(r => r.json())
 			.then(reviews => {
 				if (reviews.length === 0) {
@@ -173,7 +173,7 @@ if (page === 'home') {
 	}
 }
 
-fetch('http://127.0.0.1:3000/api/reviews')
+fetch('/api/reviews')
 	.then(response => response.json())
 	.then(reviews => {
 		reviews.forEach(item => {
@@ -259,7 +259,7 @@ if (reviewForm) {
 		const button = reviewForm.querySelector('button[type="submit"]');
 		button.disabled = true;
 
-		fetch('http://127.0.0.1:3000/api/reviews', {
+		fetch('/api/reviews', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ name, phone, review, rating: selectedRating })
