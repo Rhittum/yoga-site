@@ -59,5 +59,6 @@ app.post('/api/reviews', (req, res) => {
 });
 
 app.listen(3000, () => {
+	console.log('Database: ', process.env.DATABASE_URL);
 	console.log('Backend server is running on http://localhost-socket:3000');
 });
