@@ -29,7 +29,7 @@ app.get('/api/reviews', (req, res) => {
 	});
 });
 
-app.get('/api/reviews', (req, res) => {
+app.get('/api/reviews/rating', (req, res) => {
 	pool.query('SELECT ROUND(AVG(rating), 1) AS average, COUNT(*) AS count FROM reviews WHERE rating IS NOT NULL', (err, result) => {
 		if (err) {
 			res.status(500).json({ error: err.message });

@@ -135,7 +135,7 @@ function renderStars(rating) {
 if (page === 'home') {
 	const scrollTrack = document.getElementById('scroll-track');
 
-	fetch('/api/reviews')
+	fetch('/api/reviews/rating')
 		.then(r => r.json())
 		.then(data => {
 			const starsEl = document.getElementById('average-stars');
