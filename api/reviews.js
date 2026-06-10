@@ -51,11 +51,12 @@ app.post('/api/reviews', (req, res) => {
 		(err, result) => {
 			if (err) res.status(500).json({ error: err.message });
 			else {
-				console.log('Review inserted:', result.insertId);
-				res.status(201).json({ id: result.insertId, message: 'Review submitted' });
+				console.log('Review inserted:', result.rows[0]);
+				res.status(201).json({ id: result.rows[0], message: 'Review submitted' });
 			}
 		}
 	);
 });
 
+app.listen(3000);
 module.exports = app;

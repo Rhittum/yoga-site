@@ -736,6 +736,13 @@ textarea {
 	list-style: none;
 }
 
+
+.contact-icon {
+	fill: gray;
+	display: inline-flex;
+	align-items: center;
+}
+
 @media (max-width: 900px) {
 	.socials ul {
 		padding-left: 2rem;
